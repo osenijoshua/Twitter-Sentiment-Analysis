@@ -2,29 +2,33 @@
 (.packages())
 
 # INSTALL THIS PACKAGE BEFORE GOING FURTHER IN THE SCRIPT
-install.packages("twitteR") # THIS PACKAGE IS DEPRECATED BUT YOU CAN INSTALL IT ANYWAYS
-install.packages('rtweet')  # WE'LL BE USING THIS
-install.packages("getPass")
+install.packages('rtweet','tidyverse','getPass','lubridate')  # WE'LL BE NEEDING THESE
 
-library(tidyverse)
-library(rtweet)
-library(getPass)
-library(lubridate)
+library(tidyverse) # THIS PACKAGE REALLY HELPS IN DATA WRANGLING
+library(rtweet) # THIS WOULD HELP IN CREATING A CONNECTION TO TWITTER
+library(getPass) # FOR ENCRYPTION REASONS WHEN ENTERING YOUR TOKENS
+library(lubridate) # THIS IS USED FOR DATE-TIME TRANSFORMATION
 
 # YOU MAY NEED INTERNET CONNECTION TO RUN A NUMBER OF THESE SCRIPTS
 # AUTHORIZE R-STUDIO TO CONNECT TO TWITTER USING THE UNDERLISTED FUNCTIONS
 # NOTE THAT YOU NEED TO HAVE A TWITTER DEVELOPER ACCOUNT
 
-# api_key = getPass(msg="Enter API Key")
-# api_secret = getPass(msg="Enter API Secret")
-# access_token = getPass(msg="Enter Access Token")
-# access_secret = getPass(msg="Enter Access Token Secret")
-# 
-# create_token(app="RTweetBot2",api_key, api_secret, access_token, access_secret)
-getwd()
-auth_as(readRDS("create_token.rds"))
+api_key = getPass(msg="Enter API Key")
+api_secret = getPass(msg="Enter API Secret")
+access_token = getPass(msg="Enter Access Token")
+access_secret = getPass(msg="Enter Access Token Secret")
 
-# TWEETS THAT CONTAIN SEARCH TERM
+create_token(app="RTweetBot2",api_key, api_secret, access_token, access_secret)
+
+# ALTERNATE CONNECTION METHOD
+auth_as(readRDS("create_token.rds")) # USE THIS AUTHENTICATION METHOD IF YOU DON'T WANT TO MAKE YOUR TOKENS VISIBLE
+# THE create_token.rds FILE IS AUOTOMATICALLY CREATED IN THE WORKING DIRECTORY OF YOUR R SCRIPT AFTER INITIALLY ENTERING THE FOUR REQUIRED TOKENS i.e;
+# api_key
+# api_secret
+# access_token
+# access_secret
+
+# TWEETS THAT CONTAIN A SEARCH TERM
 tweets <- search_tweets("#FIFAWorldCup", n=100, include_rts = FALSE, lang ="en") %>%
   mutate(day.name = weekdays(as.POSIXlt(created_at, format="%Y-%m-%d %H:%M:%S"))) %>%
   mutate(day.num = wday(as.POSIXlt(created_at, format="%Y-%m-%d %H:%M:%S"), label = FALSE))
@@ -55,19 +59,16 @@ post_tweet(status = "tweeted via bot")
 get_mentions(n=15)
 
 # SENTIMENT ANALYSIS FROM TWEETS
-install.packages("textdata","tidytext","dplyr")
-library(textdata)
-library(stopwords)
-library(tidytext)
-library(RColorBrewer)
-library(tm)
-library(wordcloud)
+install.packages("textdata","tidytext","RColorBrewer","tm")
 
-# write.csv(nrc_sentiment, "C:/Users/joseni001/Documents/D&A/R/Twitter Web App/nrc_sentiment.csv")
-# nrc_sent <- read.csv("C:/Users/joseni001/Documents/D&A/R/Twitter Sentiment Analysis/nrc_sentiment.csv")
+library(textdata) # THIS PACKAGE CONTAINS DIFFERENT VOCABULARIES CRITICAL TO SENTIMENT ANALYSIS
+library(stopwords) # CONTAINS A SET OF GENERIC WORDS THAT MAY NEED TO BE EXCLUDED IN TEXT MINING 
+library(tidytext) # TEXT DATA TRANSFORMATION
+# library(RColorBrewer)
+library(ggplot) # DATA VISUALIZATION
+library(ggwordcloud) # DATA VISUALIZATION
 
 sentiment_tbl <- get_sentiments("bing") # WORD-SENTIMENTS
-# write.csv(sentiment_tbl, "C:/Users/joseni001/Documents/D&A/R/Twitter Sentiment Analysis/bing_sentiment.csv")
 
 x <- lexicon_nrc() %>%
   filter(sentiment %in% c('positive','negative'))
@@ -114,10 +115,7 @@ tb5 <- tweets %>%
   filter(!full_text %in% c(generic_words)) %>%
   count(full_text)
 
-# library(plotly)
-library(ggwordcloud)
-
-# OVERALL WORD CLOUD
+# GENERAL WORD CLOUD
 tweets %>%
   select(full_text) %>%
   unnest_tokens(input=full_text, output=full_text) %>%
