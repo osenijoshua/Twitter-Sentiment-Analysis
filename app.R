@@ -29,8 +29,8 @@ auth_as(readRDS("create_token.rds"))
 # THERE ARE TWO PARTS TO EVERY SHINY WEB APPLICATION.
 # THE UI & THE SERVER
 
-# THE UI SECTION IS WHERE THE WEB APP INTERFACE AND INTERACTIVITY IS DESIGNED
-
+# THIS IS THE UI SECTION WHERE THE LAYOUT, APPEARANCE AND INTERACTIVITY OF THE WEB APP IS DESIGNED
+# FOR EVERY UI INPUT, THERE IS USUALLY A CORRESPONDING SERVER OUTPUT.
 ui <- fluidPage(theme = shinytheme("superhero"),
                 sidebarPanel(tags$h3("Search"),
                              textInput("search", "Enter a Twitter hashtag or topic for your analysis"),
@@ -61,6 +61,9 @@ ui <- fluidPage(theme = shinytheme("superhero"),
                     )
                 ))
 
+# THIS IS THE SERVER SECTION.
+# THIS IS WHERE THE PROCESSING ENGINE AND MACHINE LEARNING MODELS SIT.
+# THEY CONTROL THE RESULTS OF INPUT MADE BY THE USER.
 server <- function(input, output) {
     output$search <- renderText({
         input$search}, quoted=FALSE
@@ -215,7 +218,6 @@ server <- function(input, output) {
     })
 }
 
-# getwd()
+# # THIS IS THE FINAL PART OF THE SHINY WEB APPLICATON
+# ALTHOUGH, IT IS NOT A CORE PORTION OF THE WEB APP. IT IS ALSO IMPORTANT AS IT CALLS THE UI & SERVER SECTIONS TOGETHER TO BUILD THE APP.
 shinyApp(ui, server)
-
-# runApp("")
