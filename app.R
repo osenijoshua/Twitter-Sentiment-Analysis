@@ -3,13 +3,11 @@
 # Find out more about building applications with Shiny here:
 #
 #    http://shiny.rstudio.com/
-#
 
 library(tidyverse)
 library(shiny)
 # library(reactable)
 library(rtweet)
-# library(getPass)
 library(lubridate)
 library(textdata)
 library(stopwords)
@@ -27,6 +25,11 @@ library(ggwordcloud)
 # create_token(app="RTweetBot2",api_key, api_secret, access_token, access_secret)
 
 auth_as(readRDS("create_token.rds"))
+
+# THERE ARE TWO PARTS TO EVERY SHINY WEB APPLICATION.
+# THE UI & THE SERVER
+
+# THE UI SECTION IS WHERE THE WEB APP INTERFACE AND INTERACTIVITY IS DESIGNED
 
 ui <- fluidPage(theme = shinytheme("superhero"),
                 sidebarPanel(tags$h3("Search"),
