@@ -22,22 +22,15 @@ library(stopwords)
 library(wordcloud)
 library(zoo)
 
-install.packages()
-
 groupchat <- rwa_read("C:\\Users\\joseni001\\Documents\\D&A\\R\\rWhatsapp\\TheWhatsappGroup_chat.txt") # Reading the chat data into R
 View(groupchat)
-?top_n
 
 # Passing groupchat into another label "gc1", extracting month, year and month-year columns from the time column,...
 # ...filtering out NA rows and performing other transformations.
 gc1 <- groupchat %>%
-                    mutate(author = gsub("<U+1ECD>","o",author)) %>% # REPLACING SUBSTRINGS FROM STRINGS
-                    mutate(author = gsub("Haytham Kenway","Joshua Oseni",author)) %>%
                     mutate(author = str_replace_all(author,fixed("+"),"")) %>%
-                    mutate(author = str_replace_all(author,"2348156768612","Ladi Junaid")) %>%
                     mutate(date.d = date(as.POSIXlt(time, format="%Y-%m-%d %H:%M:%S"))) %>%
                     filter(!is.na(author)) %>%
-                    filter(author != "+2348181121472") %>%
                     filter(author != "The WhatsApp Group") %>%
                     filter(author != "You") %>%
                     filter(!is.na(time)) %>%
@@ -68,8 +61,6 @@ View(gc1)
 
 # To check datatypes of columns in your dataset
 class(gc1$date.d)
-
-?timeLastDayInMonth
     
 # Creating a color palette for the different months in the gc1 dataset
 # Do note; that choosing your color set would depend on the number of different variables you want to plot
@@ -79,7 +70,6 @@ color.set <- brewer.pal(9,"Set1") [c(4,5,7,1,3,2,6,9,8)]
 colors.all <- display.brewer.all(n=NULL, type="div", select=NULL, exact.n=TRUE, 
                    colorblindFriendly=FALSE) [c(5,6,7)]
 display.brewer.pal(n, "Set3")
-?brewer.pal
 windowsFonts(Seg=windowsFont("Segoe UI"))
 
 gc3 <- gc1 %>%
@@ -170,8 +160,6 @@ emojitable %>%
 
 # GROUPING THE TOP EMOJIS USED BY GROUP MEMBERS
 emoji_author <- gc1 %>%
-  mutate(author = gsub("+234 815 676 8612", "Ladi Junaid", author)) %>% # FOR SOME REASON, THIS LINE ISN'T WORKING FOR..
-  #... THE ENTIRE STRING BUT WORKS WITH A SUBSTRING LIKE "8612"
   unnest(emoji, emoji_name) %>% # SEPARATING EMOJIS INTO DIFFERENT ROWS FOR AN ACCURATE COUNT
   count(author, emoji, emoji_name) %>%
   group_by(author) %>%
@@ -192,12 +180,10 @@ emoji_author %>%
  ggtitle("Top 3 Emojis Used by Group Members") +
  theme(text=element_text(family="Seg", face="bold", size =12))
 
-# GENERATING A WORDCLOUD OF THE 200 MOST USED WORDS
+# GENERATING A WORDCLOUD OF THE 100 MOST FREQUENT WORDS
 
 # CREATING A VECTOR CONTAINING GENERIC WORDS LIKE PRONOUNS AND OTHER UNNEEDED WORDS
-generic_words <- c(stopwords("en", source="stopwords-iso"),"omitted","sticker","audio","image","video","2348150520772","2348118556097",
-                   "2348134590490","2349053562823", "2347030335354","2348186037983","2348069177505","2348113786187","2348155719371","u",
-                   "2347066409305","2347010690643","dey", "na","2","3","1","2349017532376")
+generic_words <- c(stopwords("en", source="stopwords-iso"),"omitted","sticker","audio","image","video")
 
 # SUMMARIZING THE WORDS BY WORD COUNT
 summ <- gc1 %>%
@@ -206,23 +192,24 @@ summ <- gc1 %>%
   count(words)
 
 # THE WORDCLOUD
-library(tm)
+summ %>%
+    select(words) %>%
+    arrange(-n) %>%
+    slice(1:100) %>%
+    ggplot(aes(label=words, size=n, col=(n))) +
+    geom_text_wordcloud_area(rm_outside = TRUE, max_steps = 1,
+                             grid_size = 1, eccentricity = 1) +
+    scale_size_area(max_size = 35) +
+    ggtitle("A wordcloud of the 100 most frequent words") +
+    scale_color_gradient(low = "#52be80",
+                         high = "#145a32",
+                         space = "Lab",
+                         na.value = "grey50",
+                         guide = "colourbar",
+                         aesthetics = "colour")+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
-layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
-par(mar=rep(0, 4))
-plot.new()
-text(x=0.5,y=0.5,"A wordcloud of the 500 most used words",col="purple")
-wordcloud(words=summ$words, freq=summ$n, max.words = 500,
-          random.order=TRUE, rot.per=0.35, colors=brewer.pal(9, "Set2"))
-
-# gc1_sticker <- gc1 %>%
-#   select("author","text") %>%
-#   mutate(text = noquote(gc1$text)) %>%
-#   filter(text == "sticker omitted")
-
-# SENTIMENT ANALYSIS USING EMOJI
-# NOTE: I WOULDN'T RUN A SENTIMENT ANALYSIS USING THE TEXTS BECAUSE THE GROUPCHAT SPEAKS PIDGIN 95% OF THE TIME... LMAO
-# WE WOULD BE USING THE PACKAGE rvest TO EXTRACT AN HTML WEBPAGE CONTAINING EMOJI SENTIMENTS
+# USING THE PACKAGE rvest TO EXTRACT AN HTML WEBPAGE CONTAINING EMOJI SENTIMENTS
 
 install.packages("rvest")
 library(rvest)
