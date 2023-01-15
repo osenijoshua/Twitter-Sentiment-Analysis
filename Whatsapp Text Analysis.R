@@ -4,7 +4,7 @@
 (.packages())
 
 install.packages(c("rwhatsapp","lubridate","tidyverse","tidytext","kableExtra","RColorBrewer",
-                   "knitr","xfun","extrafont","timeDate","ggimage", "stopwords","wordcloud", "zoo","tm")) # install these packages
+                   "knitr","xfun","extrafont","timeDate","ggimage", "stopwords","ggwordcloud", "zoo")) # install these packages
 
 # You should install the respective packages before calling the libraries below. Run the code above!
 library(rwhatsapp)
@@ -19,7 +19,7 @@ library(extrafont)
 library(timeDate)
 library(ggimage)
 library(stopwords)
-library(wordcloud)
+library(ggwordcloud)
 library(zoo)
 
 groupchat <- rwa_read("C:\\Users\\joseni001\\Documents\\D&A\\R\\rWhatsapp\\TheWhatsappGroup_chat.txt") # Reading the chat data into R
