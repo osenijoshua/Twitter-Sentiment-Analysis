@@ -1,3 +1,2 @@
 # TwitterSentimentAnalysis
-This repository contains the script I used in designing the core engine for my shiny web application.
-You can access it here: https://osenijoshua.shinyapps.io/twitter_sentiment_analysis/
+This branch contains the scripts I wrote for my personal project on text mining and data visualization of WhatsApp chat data with R.
