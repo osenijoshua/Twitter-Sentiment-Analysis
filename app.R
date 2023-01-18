@@ -122,7 +122,7 @@ server <- function(input, output) {
             filter(!full_text %in% c(generic_words,"https","t.co")) %>%
             count(full_text) %>%
             arrange(-n) %>%
-            slice(2:51) %>%
+            slice(2:51) %>% # I AM SLICING FROM ROW 2 BECAUSE ROW 1 WOULD ALWAYS BE THE SEARCH TERM AND WE DON'T NEED THAT TO BE IN THE GENERAL WORDCLOUD
             ggplot(aes(label=full_text, size=n, col=(n))) +
             geom_text_wordcloud_area(rm_outside = TRUE, max_steps = 1,
                                      grid_size = 1, eccentricity = 1) +
